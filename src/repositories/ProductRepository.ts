@@ -47,10 +47,7 @@ export class ProductRepository implements EntityRepository<ProductEntity> {
       (productToFind) => productToFind.id === product.id
     );
     if (index !== -1) {
-      this.data[index] = {
-        ...this.data[index],
-        ...product,
-      };
+      this.data[index] = product;
       return "overwritten successfully";
     }
     return "error during overwritting";
