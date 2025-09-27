@@ -3,7 +3,6 @@ import {
   EntityRepository,
   PartialEntityWithId,
 } from "@/interfaces/EntityRepository";
-import { generateRandomID } from "@/utils/helperFunctions";
 
 interface ProductEntity extends Entity {
   name: string;
@@ -13,51 +12,89 @@ interface ProductEntity extends Entity {
 }
 
 export class ProductRepository implements EntityRepository<ProductEntity> {
-  private data: ProductEntity[] = [];
-
   async getAll(): Promise<ProductEntity[]> {
-    return this.data;
+    try {
+      const response = await fetch("/api/products");
+      if (response.ok) {
+        const result: ProductEntity[] = await response.json();
+        return result;
+      }
+      return [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   }
   async getById(id: string): Promise<ProductEntity | null> {
-    return this.data.find((product) => product.id === id) ?? null;
+    try {
+      const response = await fetch("/api/products/" + id);
+      if (response.ok) {
+        const result: ProductEntity = await response.json();
+        return result;
+      }
+      return null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
   async post(product: Omit<ProductEntity, "id">): Promise<string> {
-    const newEntity: ProductEntity = {
-      ...product,
-      id: generateRandomID(),
-    };
-    this.data.push(newEntity);
-    return "created successfully";
+    try {
+      const response = await fetch("/api/products", {
+        method: "POST",
+        body: JSON.stringify(product),
+      });
+      if (response.ok) {
+        return "created successfully";
+      }
+      return "error during creationg";
+    } catch (error) {
+      console.error(error);
+      return "error during creationg";
+    }
   }
   async patch(product: PartialEntityWithId<ProductEntity>): Promise<string> {
-    const index = this.data.findIndex(
-      (productToFind) => productToFind.id === product.id
-    );
-    if (index !== -1) {
-      this.data[index] = {
-        ...this.data[index],
-        ...product,
-      };
-      return "updated successfully";
+    try {
+      const response = await fetch("/api/products/" + product.id, {
+        method: "PATCH",
+        body: JSON.stringify(product),
+      });
+      if (response.ok) {
+        return "updated successfully";
+      }
+      return "error during updating";
+    } catch (error) {
+      console.error(error);
+      return "error during updating";
     }
-    return "error during updating";
   }
   async put(product: Omit<ProductEntity, "id">): Promise<string> {
-    const index = this.data.findIndex(
-      (productToFind) => productToFind.id === product.id
-    );
-    if (index !== -1) {
-      this.data[index] = product;
-      return "overwritten successfully";
+    try {
+      const response = await fetch("/api/products", {
+        method: "PUT",
+        body: JSON.stringify(product),
+      });
+      if (response.ok) {
+        return "overwritten successfully";
+      }
+      return "error during overwritting";
+    } catch (error) {
+      console.error(error);
+      return "error during overwritting";
     }
-    return "error during overwritting";
   }
   async delete(id: string): Promise<string> {
-    const index = this.data.findIndex((product) => product.id === id);
-    if (index !== -1) {
-      this.data.splice(index, 1);
-      return "deleted successfully";
+    try {
+      const response = await fetch("/api/products/" + id, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        return "deleted successfully";
+      }
+      return "error during deleting";
+    } catch (error) {
+      console.error(error);
+      return "error during deleting";
     }
-    return "error during deleting";
   }
 }

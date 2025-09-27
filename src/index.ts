@@ -1,5 +1,3 @@
-import { DemoComponent } from "@components/demo.components";
-
 const a: string = "Hello, World!";
 const b: number = 1;
 const c: boolean = true;
